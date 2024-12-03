@@ -157,6 +157,7 @@ private:
     std::string adicionarExtensao(std::string& filename) {
         const std::string extension = ".dat";
         filename += extension;  // Adiciona a extensão ao nome do arquivo
+        std::cout << "Nome do arquivo: " << filename << std::endl;
         return filename;
     }
 
@@ -172,6 +173,8 @@ private:
             novaString += std::to_string(vec[i].valorLeitura);
             novaString += ';';
         }
+
+        vec.clear(); // Limpar vetor de structs
 
         return novaString;
     }
@@ -194,15 +197,18 @@ private:
         std::ifstream file_check(filename);
 
         if (!file_check) {
+            std::cout << "Arquivo não existe! " << std::endl;
             return false;
         }
         else{
+            std::cout << filename << " existe!" << std::endl;
             return true;
         }
     }
 
     void criarArquivo(const std::string& filename){
         std::ofstream new_file(filename);
+        std::cout << "Arquivo: " << filename << "criado com sucesso!" << std::endl;
         return;
     }
 
@@ -211,6 +217,9 @@ private:
         std::fstream file(filename, std::fstream::out | std::fstream::in | std::fstream::binary | std::fstream::app);
         std::string stringResposta;
 
+        /*
+        std::cout << "Aguardando escritores. " << std::endl;
+        
         leitores.acquire();  // Espera até que não haja escritores
         {
             std::lock_guard<std::mutex> lock(mtx);
@@ -218,26 +227,35 @@ private:
             if (contadorLeitores == 1) {
                 // Se for o primeiro leitor, bloqueia escritores
                 escritores.acquire();
+                std::cout << "Primeiro Leitor do arquivo " << filename << std::endl;
             }
         }
+        */
 
         // Caso não ocorram erros na abertura do arquivo
         if (file.is_open()){
+            std::cout << "Arquivo: " << filename << " aberto." << std::endl;
+            
+            file.seekg(0, std::ios::end);
+            
             // Imprime a posição atual do apontador do arquivo (representa o tamanho do arquivo)
             int file_size = file.tellg();
+            std::cout << "file_size: " << file_size << std::endl;
 
             // Recupera o número de registros presentes no arquivo
             int n = file_size/sizeof(DadosArquivo);
+            std::cout << "n: " << n << std::endl;
 
             std::vector<DadosArquivo> dados;
             DadosArquivo dado;  // Para armazenar os dados lidos
 
             if(n < num){
                 // se tem menos registros dos que os solicitados, faz a leitura de todos os que têm
-                file.seekp(0, std::ios_base::beg);
+                std::cout << "n < num: " << std::endl;
+                file.seekg(0, std::ios_base::beg);
             }
             else if (n >= num) {
-                file.seekp((n-num)*sizeof(DadosArquivo), std::ios_base::beg);    
+                file.seekg((n-num)*sizeof(DadosArquivo), std::ios_base::beg);    
             }
 
             // Lendo os registros do ponto desejado até o final do arquivo
@@ -247,6 +265,7 @@ private:
         
             file.close();  // Fechar o arquivo após a leitura
 
+            /*
             // Fim da leitura
             {
                 std::lock_guard<std::mutex> lock(mtx);
@@ -257,6 +276,7 @@ private:
                 }
             }
             leitores.release();  // Libera a permissão para outro leitor entrar
+            */
 
             stringResposta = juntarStringLeitura(dados);
         }
@@ -273,7 +293,9 @@ private:
         std::string stringResposta;
         // Caso não ocorram erros na abertura do arquivo
 
+        /*
         escritores.acquire();  // Espera até que não haja leitores
+        */
 
         if (file.is_open()){
             // Imprime a posição atual do apontador do arquivo (representa o tamanho do arquivo)
@@ -291,8 +313,10 @@ private:
 
             // Fecha o arquivo
             file.close();
-
+            
+            /*
             escritores.release();  // Libera a permissão para leitores
+            */
 
             stringResposta = juntarStringEscrita(sensor);
         }
@@ -319,11 +343,20 @@ private:
             // - enviar resposta write_message(resposta)
 
             ajustarString(message);
+            std::cout << "Mensagem após ajuste: " << message << std::endl;
+
             std::vector<std::string> vetorMensagem;
             vetorMensagem = separarMensagem(message, '|');
 
+            std::cout << "Mensagem separada em tokens: ";
+            for (const auto& token : vetorMensagem) {
+                std::cout << "[" << token << "] ";  // Verificar cada token
+            }
+            std::cout << std::endl;
+
             std::string resultado;
             resultado = processarAcao(vetorMensagem);
+            std::cout << "Mensagem após consulta: " << resultado << std::endl;
             ajustarstringEnviar(resultado);
             write_message(resultado);
 

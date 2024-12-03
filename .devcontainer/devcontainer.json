@@ -1,25 +1,16 @@
 {
-	"name": "C++",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-
-
-	"customizations": {
-		"vscode": {
-			"settings": {
-        "terminal.integrated.shell.linux": "/bin/bash"
-      },
-			"extensions": [
-            "ms-vscode.cpptools", 
-            "ms-vscode.cmake-tools" 
-			]
-		}
-	},
-
-  "remoteUser": "developer",
-
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
-  ]
+    "name": "C++ Dev Container",
+    "image": "mcr.microsoft.com/devcontainers/cpp:latest",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cmake"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+    "workspaceFolder": "/workspace",
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libboost-all-dev"
 }

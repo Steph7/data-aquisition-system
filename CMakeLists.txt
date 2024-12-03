@@ -1,23 +1,22 @@
 cmake_minimum_required(VERSION 3.10)
+
+# Nome do projeto
 project(data-aquisition-system)
 
-# set C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_THREAD_PREFER_PTHREAD ON)                                                                                                                                                                                                           
-set(THREADS_PREFER_PTHREAD_FLAG ON)                                                                                                                                                                                                           
-find_package(Threads REQUIRED)                                                                                                                                                                                                                
+# Define o padrão C++
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-
-# find Boost
-find_package(Boost 1.65.1 REQUIRED COMPONENTS system)
+# Inclui as bibliotecas necessárias
+find_package(Threads REQUIRED)
+find_package(Boost 1.65.1 REQUIRED system)
 
 # include directories
 include_directories(${Boost_INCLUDE_DIRS} src)
 
-# target executable and its source files
-add_executable(das src/server.cpp)
+# Adiciona o diretório de código fonte
+add_executable(das src/main.cpp)
 
 # link Boost libraries to the target executable
 target_link_libraries(das ${Boost_LIBRARIES})
-target_link_libraries(das  Threads::Threads)                                                                                                 
+target_link_libraries(das  Threads::Threads)   
