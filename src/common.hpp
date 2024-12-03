@@ -43,6 +43,7 @@ std::string juntarStringLeitura(std::vector<DadosArquivo> &vec);
 std::string juntarStringEscrita(LogRecord sensorData);
 bool checarExistearquivo(const std::string& filename);
 void criarArquivo(const std::string& filename);
+std::string abrirarquivoLeitura(const std::string& filename, int num);
 std::string abrirarquivoEscrita(const std::string& filename, LogRecord sensor);
 
 
