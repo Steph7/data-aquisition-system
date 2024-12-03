@@ -16,7 +16,7 @@ find_package(Boost 1.65.1 REQUIRED COMPONENTS system)
 include_directories(${Boost_INCLUDE_DIRS} src)
 
 # target executable and its source files
-add_executable(das src/main.cpp)
+add_executable(das src/server.cpp)
 
 # link Boost libraries to the target executable
 target_link_libraries(das ${Boost_LIBRARIES})
