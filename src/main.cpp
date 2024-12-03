@@ -15,10 +15,10 @@
 using boost::asio::ip::tcp;
 
 std::counting_semaphore<> escritores(1);  // Apenas um escritor pode acessar por vez
-std::counting_semaphore<> leitores(0);    // Controla o número de leitores ativos
+std::counting_semaphore<> leitores(1);    // Controla o número de leitores ativos
 std::mutex mtx;  // Mutex para proteger a variável de leitura
 
-int contadorLeitores;  // Contador de leitores ativos
+int contadorLeitores = 0;  // Contador de leitores ativos
 
 struct LogRecord {
     char sensor_id[32]; // supondo um ID de sensor de até 32 caracteres
@@ -217,20 +217,20 @@ private:
         std::fstream file(filename, std::fstream::out | std::fstream::in | std::fstream::binary | std::fstream::app);
         std::string stringResposta;
 
-        /*
         std::cout << "Aguardando escritores. " << std::endl;
-        
         leitores.acquire();  // Espera até que não haja escritores
+        std::cout << "Semáforo de leitores adquirido." << std::endl;
+
         {
             std::lock_guard<std::mutex> lock(mtx);
             contadorLeitores++;
             if (contadorLeitores == 1) {
                 // Se for o primeiro leitor, bloqueia escritores
                 escritores.acquire();
-                std::cout << "Primeiro Leitor do arquivo " << filename << std::endl;
+                std::cout << "Primeiro Leitor do arquivo: " << filename << std::endl;
             }
         }
-        */
+
 
         // Caso não ocorram erros na abertura do arquivo
         if (file.is_open()){
@@ -265,7 +265,7 @@ private:
         
             file.close();  // Fechar o arquivo após a leitura
 
-            /*
+            
             // Fim da leitura
             {
                 std::lock_guard<std::mutex> lock(mtx);
@@ -276,7 +276,7 @@ private:
                 }
             }
             leitores.release();  // Libera a permissão para outro leitor entrar
-            */
+            
 
             stringResposta = juntarStringLeitura(dados);
         }
@@ -293,9 +293,9 @@ private:
         std::string stringResposta;
         // Caso não ocorram erros na abertura do arquivo
 
-        /*
+        
         escritores.acquire();  // Espera até que não haja leitores
-        */
+        
 
         if (file.is_open()){
             // Imprime a posição atual do apontador do arquivo (representa o tamanho do arquivo)
@@ -314,9 +314,9 @@ private:
             // Fecha o arquivo
             file.close();
             
-            /*
+            
             escritores.release();  // Libera a permissão para leitores
-            */
+            
 
             stringResposta = juntarStringEscrita(sensor);
         }
